@@ -8,7 +8,7 @@ import os
 import time
 import webbrowser
 console = Console()
-with open("ascii-text-art.txt", "r") as file:
+with open("ascii-text-art.txt", "r") as file:  
             ascii_art = file.read()
             print(ascii_art)
 
@@ -28,6 +28,7 @@ def exit():
         time.sleep(1)
         sys.exit()
 def login():
+        print("Please enter you data to login")
         answer1 = questionary.text("Choose a username, please!!").ask()
         answer2 = questionary.password("Choose a Password, please!!").ask()
         
@@ -84,17 +85,15 @@ def options():
                                 open(f"{file_name}.txt", "w")
 
         elif program_options == "store a code snippet":
+                code_snippet_text = []
                 def code_snippet():
                         code_input = input("input your code")
-                        code_snippet_text = []
                         code_snippet_text.append(code_input)
-                        with open("code.json", "a") as file:
+                        console.print(Panel("[bold green]code snippet created successfully! [/bold green]"))
+                        with open("code.json", "w") as file:
                                 json.dump(code_snippet_text, file)
-                                file.write(",")
-                                console.print(Panel("[bold green]code snippet created successfully! [/bold green]"))
-
-        
-
+                        if isinstance(file, list) and file:
+                                last_item = file[-1].remove(",")
                 code_snippet()
                 restart_function = questionary.select("Would you like to save another code snippet??",
                                                                         choices = ["yes", "no"]).ask()
@@ -103,8 +102,22 @@ def options():
                 elif restart_function == "no":
                         options()
         elif program_options == "execute a code":
-                code_snippet_text = input("please write your code here!")
-                exec(code_snippet_text)
+                console.print(Panel("[bold green]Welcome to the code execution section![/bold green]"))
+                execution_options = questionary.select("Choose option 1 to access and choose code to execute from the file or choose option 2 to write a code snippet to execute!!!"
+                                                , choices = ["option 1", "option 2"]).ask()
+                if execution_options == "option 1":
+                        with open("code.json", "r") as file:
+                                stored_code = json.load(file)
+                        selected_code = questionary.select("Choose a code snippet to execute!", 
+                                                        choices = stored_code).ask()
+                        exec(selected_code)
+                        console.print(Panel("[bold green]Code executed successfully![/bold green]"))
+                elif execution_options == "option 2":
+                        code_snippet_text = input("please write your code here!")
+                        exec(code_snippet_text)
+                        console.print(Panel("[bold green]Code executed successfully![/bold green]"))
+                time.sleep(1)
+                return_back()
         elif program_options == "reach some documentations":
                 doc_select = questionary.select("[bold green]choose a documentation to be forwarded to[/bold green]", 
                                                 choices = ["git", "github"]).ask()
